@@ -165,7 +165,13 @@ namespace FastUlid
 
     public override int GetHashCode()
     {
-      return _bytes != null ? _bytes.GetHashCode() : 0;
+      unchecked
+      {
+        var hashCode = 123;
+        for (var i = 0; i < 16; i++) 
+          hashCode = hashCode * 23 + _bytes[i].GetHashCode();
+        return hashCode;
+      }
     }
 
     public void CopyTo(byte[] array, int index)
