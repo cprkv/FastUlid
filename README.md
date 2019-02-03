@@ -32,7 +32,7 @@ var dst = new byte[16]; id.CopyTo(dst, 0);  // binary store
 
  * Using string:
 ```cs
-var encoded = id.Encode();                  // returns string
+var encoded = id.Encode();                  // returns string, like 01D2RXZS981QZGSEYYFA4EQMRZ
 var decoded = Ulid.Decode(encoded);         // returns Ulid
 ```
 
@@ -60,7 +60,7 @@ If instance of `Ulid` not constructed by `UlidGen`, length validation should be 
 
  * Results on my machine:
 
- ``` ini
+``` ini
 BenchmarkDotNet=v0.11.3, OS=centos 7
 Intel Core i5-6400 CPU 2.70GHz (Skylake), 1 CPU, 4 logical and 4 physical cores
 .NET Core SDK=2.2.103
@@ -78,8 +78,12 @@ Intel Core i5-6400 CPU 2.70GHz (Skylake), 1 CPU, 4 logical and 4 physical cores
 
  * Run commands to benchmark:
  
- ```
- cd FastUlid.Bench
- dotnet build -c Release
- dotnet exec ./bin/Release/netcoreapp2.2/FastUlid.Bench.dll
- ```
+```sh
+cd FastUlid.Bench
+dotnet build -c Release
+dotnet exec ./bin/Release/netcoreapp2.2/FastUlid.Bench.dll
+```
+
+## Reference
+
+This project is my adaptation of [skeeto/ulid-c](https://github.com/skeeto/ulid-c) for dotnet.
