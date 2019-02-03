@@ -1,9 +1,9 @@
-using System;
-using System.Runtime.InteropServices.ComTypes;
-
 namespace FastUlid
 {
-  public sealed class UlidGen
+  /// <summary>
+  /// ULID generator.
+  /// </summary>
+  public sealed class UlidGen : IUlidGen
   {
     private readonly byte[] _s;
     private readonly byte[] _last;
@@ -20,7 +20,7 @@ namespace FastUlid
       for (var i = 0; i < 256; i++)
         _s[i] = (byte) i;
 
-      var key = Entropy(256);
+      var key = Functions.Entropy(256);
 
       for (int i = 0, j = 0; i < 256; i++)
       {
@@ -33,8 +33,12 @@ namespace FastUlid
 
     public Ulid Generate()
     {
-      var ts = UTime() / 1000;
+      var ts = Functions.UTime() / 1000;
+      return GenerateInternal(ts);
+    }
 
+    internal Ulid GenerateInternal(ulong ts)
+    {
       if (_lastTs == ts)
       {
         for (var i = 15; i > 5; i--)
@@ -61,29 +65,7 @@ namespace FastUlid
           _last[6 + k] = _s[(_s[_i] + _s[_j]) & 0xff];
         }
       }
-
       return new Ulid(_last);
-    }
-
-    private static ulong UTime()
-    {
-      var hFt1 = DateTime.UtcNow.ToFileTimeUtc();
-      var ft = new FILETIME
-      {
-        dwLowDateTime = (int) (hFt1 & 0xFFFFFFFF),
-        dwHighDateTime = (int) (hFt1 >> 32)
-      };
-      return ((ulong) ft.dwHighDateTime << 32 |
-              (ulong) ft.dwLowDateTime << 0)
-             / 10 - 11644473600000000UL;
-    }
-
-    private static byte[] Entropy(int len)
-    {
-      var result = new byte[len];
-      var rand = new Random();
-      rand.NextBytes(result);
-      return result;
     }
   }
 }

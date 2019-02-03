@@ -26,18 +26,19 @@ A ULID however:
 ## Sample code
 
 ```cs
-var gen = new UlidGen();                    // create generator
+var gen = new UlidGen();                    // create singlethread generator
 var id = gen.Generate();                    // comparable item
 var idNext = gen.Generate();                // next id is always greater: idNext > id
 id.ToString();                              // readable format
 var dst = new byte[16]; id.CopyTo(dst, 0);  // binary store
+var gen = new UlidGenTS();                  // multithread id generator (thread safe)
 ```
 
 ### Serialization
 
  * Using string:
 ```cs
-var encoded = id.Encode();                  // returns string, like 01D2RXZS981QZGSEYYFA4EQMRZ
+var encoded = id.Encode();                  // returns string, like "01D2RXZS981QZGSEYYFA4EQMRZ"
 var decoded = Ulid.Decode(encoded);         // returns Ulid
 ```
 
@@ -71,12 +72,13 @@ Intel Core i5-6400 CPU 2.70GHz (Skylake), 1 CPU, 4 logical and 4 physical cores
   DefaultJob : .NET Core 2.2.1 (CoreCLR 4.6.27207.03, CoreFX 4.6.27207.03), 64bit RyuJIT
 ```
 
-|             Method |         Mean |      Error |     StdDev |
-|------------------- |-------------:|-----------:|-----------:|
-|   FastUlid_Version |     82.43 ns |   1.187 ns |   1.110 ns |
-|      NUlid_Version |    842.83 ns |   4.318 ns |   3.828 ns |
-| SystemGuid_Version |  1,372.10 ns |   6.711 ns |   6.277 ns |
-|    UlidNet_Version | 31,741.53 ns | 338.760 ns | 316.876 ns |
+|                 Method |         Mean |       Error |      StdDev |
+|----------------------- |-------------:|------------:|------------:|
+|               **FastUlid** |     89.06 ns |   0.9366 ns |   0.8761 ns |
+| **FastUlid thread safe** |    123.35 ns |   2.0844 ns |   1.9498 ns |
+|                  NUlid |    835.25 ns |   3.6955 ns |   3.4568 ns |
+|            System.Guid |  1,403.89 ns |   4.6105 ns |   4.3126 ns |
+|               Ulid.Net | 32,135.94 ns | 359.0906 ns | 318.3245 ns |
 
 
  * Run commands to benchmark:
@@ -84,7 +86,7 @@ Intel Core i5-6400 CPU 2.70GHz (Skylake), 1 CPU, 4 logical and 4 physical cores
 ```sh
 cd FastUlid.Bench
 dotnet build -c Release
-dotnet exec ./bin/Release/netcoreapp2.2/FastUlid.Bench.dll
+dotnet exec ./bin/Release/netcoreapp2.2/FastUlid.Bench.dll --filter 'FastUlid.*'
 ```
 
 ## Reference
