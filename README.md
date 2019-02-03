@@ -56,18 +56,6 @@ var encoded = id.ToGuid();                  // returns Guid
 var decode = Ulid.FromGuid(encoded);        // returns Ulid
 ```
 
-## Summary
-
-`UlidGen` instance is **not** thread safe!
-
-Works perfect on single machine.
-In case of having many machines you probably needs to add machine id.
-See method `CopyTo`.
-
-Structure `Ulid` works only with 16 length byte array.
-If instance of `Ulid` not constructed by `UlidGen`, length validation should be done by clients.
-
-
 ## Benchmarks
 
  * Results on my machine:
