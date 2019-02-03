@@ -1,7 +1,14 @@
 # FastUlid
-Fastest Universally Unique Lexicographically Sortable Identifier
 
-## Benefits
+Fastest Universally Unique Lexicographically Sortable Identifier library for DotNet.
+
+## Library summary
+
+ * Crossplatform
+ * DotNet standard 2.0
+ * Not thread safe
+
+## Benefits of ULID
 
 A GUID/UUID can be suboptimal for many use-cases because:
 
@@ -10,12 +17,10 @@ A GUID/UUID can be suboptimal for many use-cases because:
 
 A ULID however:
 
+ * Lexicographically sortable!
  * Is compatible with UUID/GUID's
  * 1,208,925,819,614,629,174,706,176 unique ULIDs per millisecond possible to be generated theoretically (in real benchmark ~12,000,000 ULIDs per second by one thread on modern cpu)
- * Lexicographically sortable
  * Canonically encoded as a 26 character string, as opposed to the 36 character UUID
- * Uses Crockford's base32 for better efficiency and readability (5 bits per character)
- * Case insensitive
  * No special characters (URL safe)
 
 ## Sample code
@@ -41,8 +46,6 @@ var decoded = Ulid.Decode(encoded);         // returns Ulid
 var encoded = id.ToGuid();                  // returns Guid
 var decode = Ulid.FromGuid(encoded);        // returns Ulid
 ```
-
-**Warning**: `Ulid.FromGuid` accepts only id's serialized from `Ulid` via `ToGuid` method!
 
 ## Summary
 
