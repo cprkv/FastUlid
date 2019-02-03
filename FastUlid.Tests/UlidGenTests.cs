@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -57,7 +58,7 @@ namespace FastUlid.Tests
 
     [Theory]
     [MemberData(nameof(UlidCounts))]
-    public void SortStrTest(int c)
+    public void SortEncodedTest(int c)
     {
       var gen = new UlidGen();
       var l = new List<Ulid>();
@@ -66,14 +67,14 @@ namespace FastUlid.Tests
       for (var i = 0; i < c; i++)
       {
         l.Add(gen.Generate());
-        ls.Add(l[i].ToString());
+        ls.Add(l[i].Encode());
       }
 
       ls.Sort();
 
       for (var i = 0; i < l.Count; i++)
       {
-        if (ls[i] != l[i].ToString())
+        if (ls[i] != l[i].Encode())
         {
           Assert.False(
             true,
@@ -81,6 +82,24 @@ namespace FastUlid.Tests
           );
         }
       }
+    }
+
+    [Theory]
+    [MemberData(nameof(UlidCounts))]
+    public void DistinctEncodedUniqueTest(int c)
+    {
+      var gen = new UlidGen();
+      var l = new List<string>();
+
+      for (var i = 0; i < c; i++)
+      {
+        l.Add(gen.Generate().Encode());
+      }
+
+      Assert.Equal(
+        l.Count,
+        l.Distinct().Count()
+      );
     }
 
     [Theory]
@@ -93,13 +112,74 @@ namespace FastUlid.Tests
       for (var i = 0; i < c; i++)
       {
         l.Add(gen.Generate());
-        _output.WriteLine(l[i].ToString('-'));
       }
 
       Assert.Equal(
         l.Count,
         l.Distinct().Count()
       );
+    }
+
+    [Theory]
+    [MemberData(nameof(UlidCounts))]
+    public void EncodeDecodeWithGuidTest(int c)
+    {
+      var gen = new UlidGen();
+
+      for (var i = 0; i < c; i++)
+      {
+        var id = gen.Generate();
+
+        Assert.Equal(
+          id.ToGuid(),
+          Ulid.Decode(id.Encode()).ToGuid()
+        );
+      }
+    }
+
+    [Fact]
+    public void DecodeThrowsOnUnexpectedCharacterTest()
+    {
+      Assert.Throws<ArgumentOutOfRangeException>(
+        () => Ulid.Decode(null)
+      );
+      Assert.Throws<ArgumentOutOfRangeException>(
+        () => Ulid.Decode("")
+      );
+      Assert.Throws<ArgumentOutOfRangeException>(
+        () => Ulid.Decode("absdgg34tgga")
+      );
+      Assert.Throws<ArgumentOutOfRangeException>(
+        () => Ulid.Decode("привет, мир!")
+      );
+    }
+
+    [Theory]
+    [MemberData(nameof(UlidCounts))]
+    public void GuidTest(int c)
+    {
+      var gen = new UlidGen();
+      var l = new List<Ulid>();
+      var ls = new List<Guid>();
+
+      for (var i = 0; i < c; i++)
+      {
+        l.Add(gen.Generate());
+        ls.Add(l[i].ToGuid());
+      }
+
+      for (var i = 0; i < l.Count; i++)
+      {
+        var ulid = Ulid.FromGuid(ls[i]);
+
+        if (l[i] != ulid)
+        {
+          Assert.False(
+            true,
+            $"{ulid} != {l[i]} at {i} element!"
+          );
+        }
+      }
     }
   }
 }

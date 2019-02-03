@@ -1,16 +1,48 @@
 # FastUlid
 Fastest Universally Unique Lexicographically Sortable Identifier
 
+## Benefits
+
+A GUID/UUID can be suboptimal for many use-cases because:
+
+ * It isn't the most character efficient way of encoding 128 bits
+ * It provides no other information than randomness
+
+A ULID however:
+
+ * Is compatible with UUID/GUID's
+ * 1,208,925,819,614,629,174,706,176 unique ULIDs per millisecond possible to be generated theoretically (in real benchmark ~12,000,000 ULIDs per second by one thread on modern cpu)
+ * Lexicographically sortable
+ * Canonically encoded as a 26 character string, as opposed to the 36 character UUID
+ * Uses Crockford's base32 for better efficiency and readability (5 bits per character)
+ * Case insensitive
+ * No special characters (URL safe)
+
 ## Sample code
 
 ```cs
 var gen = new UlidGen();                    // create generator
 var id = gen.Generate();                    // comparable item
 var idNext = gen.Generate();                // next id is always greater: idNext > id
-id.ToString();                              // not readable, but good to store
-id.ToString('-');                           // more readable format
+id.ToString();                              // readable format
 var dst = new byte[16]; id.CopyTo(dst, 0);  // binary store
 ```
+
+### Serialization
+
+ * Using string:
+```cs
+var encoded = id.Encode();                  // returns string
+var decoded = Ulid.Decode(encoded);         // returns Ulid
+```
+
+ * Using Guid (good for EntityFramework, Newtonsoft.Json, AspNet):
+```cs
+var encoded = id.ToGuid();                  // returns Guid
+var decode = Ulid.FromGuid(encoded);        // returns Ulid
+```
+
+**Warning**: `Ulid.FromGuid` accepts only id's serialized from `Ulid` via `ToGuid` method!
 
 ## Summary
 
@@ -21,8 +53,8 @@ In case of having many machines you probably needs to add machine id.
 See method `CopyTo`.
 
 Structure `Ulid` works only with 16 length byte array.
-Don't try to contsruct it yourself.
-Thats done by `UlidGen.Generate` method.
+If instance of `Ulid` not constructed by `UlidGen`, length validation should be done by clients.
+
 
 ## Benchmarks
 
