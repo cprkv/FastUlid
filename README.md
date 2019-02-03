@@ -6,7 +6,7 @@ Fastest Universally Unique Lexicographically Sortable Identifier library for Dot
 
  * Crossplatform
  * DotNet standard 2.0
- * Not thread safe
+ * Thread safe id generation
 
 ## Benefits of ULID
 
@@ -26,13 +26,21 @@ A ULID however:
 ## Sample code
 
 ```cs
-var gen = new UlidGen();                    // create singlethread generator
+var gen = new UlidGen();                    // create simple generator (not thread safe)
 var id = gen.Generate();                    // comparable item
 var idNext = gen.Generate();                // next id is always greater: idNext > id
 id.ToString();                              // readable format
 var dst = new byte[16]; id.CopyTo(dst, 0);  // binary store
-var gen = new UlidGenTS();                  // multithread id generator (thread safe)
 ```
+
+### Thread safe version
+
+```cs
+var gen = new UlidGenTS();
+```
+
+Remark: thread safe version `UlidGenTS` is 35% slower, then simple version `UlidGen`.
+
 
 ### Serialization
 
